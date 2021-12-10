@@ -8,6 +8,8 @@ Created on Fri Dec  3 09:29:09 2021
 from pyface import face
 import numpy as np
 class MonitorFace():
+    def __init__(self,*args,**kwargs):
+        self.trace = {}
     def init_trace(self):
         self.trace = {}
     
@@ -55,21 +57,30 @@ class MonitorFace():
         inventory = self.make_inventory()
         lt = ['Gdes_l','Gdes_r','inflx','net_inflx']
         li = ['int_dsrf','int_dens','content']
-        ll = lt + li + ['net_content','net_balance']
-        str = len(ll)*'| {} |'
-        print(str.format(*ll))
+        ll = lt + li 
+        strs = len(ll)*'| {:10s} |'
+        strf = len(ll)*'| {:3.1e} |'
+        print('')
+        print(100*'*')
+        print(strs.format(*ll))
         net_content = {}
         net_balance = {}
         for k in range(face.nspc):
             vt = [self.trace[k][l] for l in lt]
             vi = [inventory[k][l] for l in li]
+            v = vt + vi
+            print(strf.format(*v))
+        print(100*'*')
+        ll = ['net_content','net_balance','error[%]']
+        strs = len(ll)*'| {:10s} |'
+        strf = len(ll)*'| {:3.1e} |'
+        for k in range(face.nspc):
             if hasattr(self,'initial_inventory'):
                 net_content[k] = inventory[k]['content']-self.initial_inventory[k]['content']
             net_balance[k] = net_content[k] - self.trace[k]['net_inflx'] 
-            v= vt + vi + [net_content[k], net_balance[k]]
-            print(str.format(*v))
-        
-
+            v=  [net_content[k], net_balance[k],(net_content[k]-net_balance[k])/net_balance[k]*100 ]
+            print(strf.format(*v))
+        print(100*'*')
 def integrales_src():
      return np.array([np.sum(face.src[-1,:,k]*face.dx) for k in range(face.nspc)])       
 def integrales_srs():
@@ -104,25 +115,3 @@ def integrales_dsrf():
     return int_dsrf   
 def integrales_src_profile():
     return np.array([np.sum(face.src_profile[:,k]*face.dx) for k in range(face.nspc)])  
-    #     ! sum up the outgassing flux left and right over time to estimate the average outgassing flux over the simulation
-    #     ! end verify if <Gdes_l>\approx Gdes_l(end)
-    #     real:: int_src,int_dens,int_dsrf,int_des
-    #     integer k,j
-    #      if (print_onthefly_inventory) then
-    #     do k=1,nspc
-    #         int_src=integrale_src(k)*dt_face
-    #         int_dens=integrale_dens(k)
-
-             
-
-    #         onthefly_net_int_dens(k)=int_dens-onthefly_int_dens(k)
-    #         onthefly_net_int_dsrf(k)=int_dsrf-onthefly_int_dsrf(k)
-    #         onthefly_int_dens(k)=int_dens
-    #         onthefly_int_src(k)=int_src
-    #         onthefly_int_dsrf(k)=int_dsrf
-    #         onthefly_int_des(k)=int_des
-    #     enddo
-    #     endif
-
-    # end subroutine compute_onthefly_inventory    
-#       
