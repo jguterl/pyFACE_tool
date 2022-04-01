@@ -37,7 +37,7 @@ class RunFACE(monitor.MonitorFace,PlotFACE,io.IOFACE):
         face.nspc = nspc
         face.ngrd = ngrd
         face.ndt = ndt
-        face.allocate()
+        face.allocate_face()
         self.upload_dic(kwargs, enforce)
         self.import_face_package()
         
